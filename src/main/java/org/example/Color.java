@@ -25,4 +25,14 @@ public class Color {
     public int hashCode() {
         return Arrays.hashCode(color);
     }
+
+    public int toRGB() {
+        int red = (int) Math.round(this.color[0] * 255);
+        int green = (int) Math.round(this.color[1] * 255);
+        int blue = (int) Math.round(this.color[2] * 255);
+
+        return ((red & 0xff) << 16)
+                + ((green & 0xff) << 8)
+                + (blue & 0xff);
+    }
 }
