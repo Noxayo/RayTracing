@@ -14,6 +14,9 @@ public class Vector {
     public double[] getVector() {
         return vector;
     }
+    public void setVector(double[] vector) {
+        this.vector = vector;
+    }
 
     @Override
     public boolean equals(Object o) {
