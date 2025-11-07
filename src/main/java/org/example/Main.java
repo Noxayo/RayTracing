@@ -9,7 +9,12 @@ public class Main {
 
         AbstractVec3 Calc = new AbstractVec3();
 
+
+
+
         double[] v3 = Calc.addition(v1.getVector(),v2.getVector());
+
+        v3 = Calc.multiplicationByScalar(4, v3);
 
         System.out.println(Arrays.toString(v3));
     }

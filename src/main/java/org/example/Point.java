@@ -13,6 +13,9 @@ public class Point {
     public double[] getPoint() {
         return point;
     }
+    public void setPoint(double[] point) {
+        this.point = point;
+    }
 
     @Override
     public boolean equals(Object o) {

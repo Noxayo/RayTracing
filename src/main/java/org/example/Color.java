@@ -13,6 +13,9 @@ public class Color {
     public double[] getColor() {
         return color;
     }
+    public void setColor(double[] color) {
+        this.color = color;
+    }
 
     @Override
     public boolean equals(Object o) {
