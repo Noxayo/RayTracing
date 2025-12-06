@@ -171,7 +171,7 @@ public class SceneFileParser {
         double fov = Double.parseDouble(tokens[10]);
 
         Camera camera = new Camera(lookFrom, lookAt, up, fov);
-        scene.setCamera(Camera);
+        scene.setCamera(camera);
     }
 
     /**

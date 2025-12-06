@@ -31,8 +31,8 @@ import java.util.Arrays;
             SceneFileParser parser = new SceneFileParser();
 
             try {
-                // REMPLACEZ ce chemin par celui de votre fichier .scene
-                String sceneFile = "scenes/test.scene";
+                // chemin de fichier .scene (j'ai toujours le message que le chemin d'accès marche pas)
+                String sceneFile = "/src/main/java/Scenes/test1.scene";
 
                 System.out.println(" Lecture du fichier: " + sceneFile);
                 System.out.println("...\n");
