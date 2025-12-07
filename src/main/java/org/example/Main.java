@@ -32,7 +32,7 @@ import java.util.Arrays;
 
             try {
                 // chemin de fichier .scene (j'ai toujours le message que le chemin d'accès marche pas)
-                String sceneFile = "/src/main/java/Scenes/test1.scene";
+                String sceneFile = "src/main/java/Scenes/test1.scene";
 
                 System.out.println(" Lecture du fichier: " + sceneFile);
                 System.out.println("...\n");
