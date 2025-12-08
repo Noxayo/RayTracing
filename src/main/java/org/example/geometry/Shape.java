@@ -12,6 +12,7 @@ import org.example.Color;
 public abstract class Shape {
     protected Color diffuse;   // Couleur de l'objet
     protected Color specular;  // Couleur de la réflexion (effet miroir)
+    protected double shininess; // Exposant de brillance (Phong)
 
     /**
      * Constructeur
@@ -21,6 +22,7 @@ public abstract class Shape {
     public Shape(Color diffuse, Color specular) {
         this.diffuse = diffuse;
         this.specular = specular;
+        this.shininess = 0.0;
     }
 
     // ========== GETTERS ==========
@@ -33,6 +35,8 @@ public abstract class Shape {
         return specular;
     }
 
+    public double getShininess() { return shininess; }
+
     // ========== SETTERS ==========
 
     public void setDiffuse(Color diffuse) {
@@ -42,4 +46,9 @@ public abstract class Shape {
     public void setSpecular(Color specular) {
         this.specular = specular;
     }
+
+    public void setShininess(double shininess) { this.shininess = shininess; }
+
+    // Intersection API for Step 3
+    public abstract org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray);
 }

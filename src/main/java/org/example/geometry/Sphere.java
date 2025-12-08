@@ -52,4 +52,28 @@ public class Sphere extends Shape {
                 ", diffuse=" + diffuse +
                 ", specular=" + specular + "}";
     }
+
+    @Override
+    public org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray) {
+        org.example.AbstractVec3 V = new org.example.AbstractVec3();
+        double[] origin = ray.getOrigin();
+        double[] dir = ray.getDirection();
+        double[] C = center.getPoint();
+        double[] oc = V.subtraction(origin, C);
+        double a = V.scalarProduct(dir, dir);
+        double b = 2.0 * V.scalarProduct(oc, dir);
+        double c = V.scalarProduct(oc, oc) - radius * radius;
+        double disc = b * b - 4 * a * c;
+        if (disc < 0) return null;
+        double sqrtD = Math.sqrt(disc);
+        double t1 = (-b - sqrtD) / (2 * a);
+        double t2 = (-b + sqrtD) / (2 * a);
+        double t = Double.POSITIVE_INFINITY;
+        if (t1 > 1e-6) t = Math.min(t, t1);
+        if (t2 > 1e-6) t = Math.min(t, t2);
+        if (t == Double.POSITIVE_INFINITY) return null;
+        double[] point = V.addition(origin, V.multiplicationByScalar(t, dir));
+        double[] normal = V.normalization(V.subtraction(point, C));
+        return new org.example.raytracer.Intersection(this, t, point, normal);
+    }
 }

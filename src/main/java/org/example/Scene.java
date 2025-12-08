@@ -27,8 +27,9 @@ public class Scene {
 
     // ========== ATTRIBUTS TEMPORAIRES POUR LE PARSING ==========
     // Ces couleurs sont utilisées pour les prochains objets créés
-    private Color currentDiffuse = new Color();    // Couleur diffuse courante
+    private Color currentDiffuse = new Color(1, 1, 1);    // Couleur diffuse courante (par défaut blanc)
     private Color currentSpecular = new Color();   // Couleur spéculaire courante
+    private double currentShininess = 0.0;         // Exposant de brillance (Phong)
 
     // Pour les triangles
     private List<Point> vertices = new ArrayList<>();  // Liste des sommets (vertex)
@@ -79,6 +80,10 @@ public class Scene {
         return currentSpecular;
     }
 
+    public double getCurrentShininess() {
+        return currentShininess;
+    }
+
     public List<Point> getVertices() {
         return vertices;
     }
@@ -116,6 +121,10 @@ public class Scene {
 
     public void setCurrentSpecular(Color currentSpecular) {
         this.currentSpecular = currentSpecular;
+    }
+
+    public void setCurrentShininess(double currentShininess) {
+        this.currentShininess = currentShininess;
     }
 
     public void setMaxVerts(int maxVerts) {
@@ -157,6 +166,14 @@ public class Scene {
                 ", lights=" + lights.size() +
                 ", shapes=" + shapes.size() +
                 '}';
+    }
+
+    /**
+     * Calcule la couleur au point d'intersection donné, selon l'éclairage de la scène.
+     * Délègue au calcul défini côté Intersection pour respecter le jalon.
+     */
+    public Color computeColor(org.example.raytracer.Intersection intersection, double[] eye) {
+        return intersection.computeColor(this, eye);
     }
 }
 /* import java.util.ArrayList;

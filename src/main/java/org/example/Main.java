@@ -24,7 +24,7 @@ import java.util.Arrays;
     public class Main {
         public static void main(String[] args) {
             System.out.println("========================================");
-            System.out.println("    TEST DU PARSER - JALON 2");
+            System.out.println("   PARSING + RENDER - JALON 3");
             System.out.println("========================================\n");
 
             // Créer le parser
@@ -32,7 +32,7 @@ import java.util.Arrays;
 
             try {
                 // chemin de fichier .scene (j'ai toujours le message que le chemin d'accès marche pas)
-                String sceneFile = "src/main/java/Scenes/test1.scene";
+                String sceneFile = "src/main/java/Scenes/tp45.test";
 
                 System.out.println(" Lecture du fichier: " + sceneFile);
                 System.out.println("...\n");
@@ -78,8 +78,19 @@ import java.util.Arrays;
                     System.out.println("\n VERTICES: " + scene.getVertices().size());
                 }
 
+                // Lancer le rendu
                 System.out.println("\n========================================");
-                System.out.println(" JALON 2 TERMINÉ AVEC SUCCÈS !");
+                System.out.println(" DÉMARRAGE DU RENDERER");
+                System.out.println("========================================");
+                org.example.raytracer.Renderer renderer = new org.example.raytracer.Renderer();
+                try {
+                    renderer.render(scene);
+                    System.out.println(" Image écrite dans: " + scene.getOutput());
+                } catch (java.io.IOException io) {
+                    System.err.println(" Échec d'écriture de l'image: " + io.getMessage());
+                }
+                System.out.println("\n========================================");
+                System.out.println(" JALON 3 TERMINÉ AVEC SUCCÈS !");
                 System.out.println("========================================\n");
 
             } catch (Exception e) {

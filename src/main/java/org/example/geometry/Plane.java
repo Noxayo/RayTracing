@@ -52,4 +52,21 @@ public class Plane extends Shape {
                 ", diffuse=" + diffuse +
                 ", specular=" + specular + "}";
     }
+
+    @Override
+    public org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray) {
+        org.example.AbstractVec3 V = new org.example.AbstractVec3();
+        double[] origin = ray.getOrigin();
+        double[] dir = ray.getDirection();
+        double[] P0 = point.getPoint();
+        double[] N = normal.getVector();
+
+        double denom = V.scalarProduct(N, dir);
+        if (Math.abs(denom) < 1e-8) return null; // parallel
+        double t = V.scalarProduct(V.subtraction(P0, origin), N) / denom;
+        if (t <= 1e-6) return null;
+        double[] hitPoint = V.addition(origin, V.multiplicationByScalar(t, dir));
+        double[] n = V.normalization(N);
+        return new org.example.raytracer.Intersection(this, t, hitPoint, n);
+    }
 }

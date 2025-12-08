@@ -89,6 +89,9 @@ public class SceneFileParser {
         else if (command.equals("specular")) {
             parseSpecular(tokens, scene);
         }
+        else if (command.equals("shininess")) {
+            parseShininess(tokens, scene);
+        }
         else if (command.equals("directional")) {
             parseDirectionalLight(tokens, scene);
         }
@@ -225,6 +228,18 @@ public class SceneFileParser {
     }
 
     /**
+     * Parse: shininess s
+     * Définit l'exposant de brillance pour les prochains objets
+     */
+    private void parseShininess(String[] tokens, Scene scene) {
+        if (tokens.length != 2) {
+            throw new IllegalArgumentException("shininess attend 1 paramètre");
+        }
+        double s = Double.parseDouble(tokens[1]);
+        scene.setCurrentShininess(s);
+    }
+
+    /**
      * Parse: directional x y z r g b
      */
     private void parseDirectionalLight(String[] tokens, Scene scene) {
@@ -302,6 +317,7 @@ public class SceneFileParser {
                 scene.getCurrentDiffuse(),
                 scene.getCurrentSpecular()
         );
+        sphere.setShininess(scene.getCurrentShininess());
         scene.addShape(sphere);
     }
 
@@ -363,6 +379,7 @@ public class SceneFileParser {
                 scene.getCurrentDiffuse(),
                 scene.getCurrentSpecular()
         );
+        triangle.setShininess(scene.getCurrentShininess());
         scene.addShape(triangle);
     }
 
@@ -395,6 +412,7 @@ public class SceneFileParser {
                 scene.getCurrentDiffuse(),
                 scene.getCurrentSpecular()
         );
+        plane.setShininess(scene.getCurrentShininess());
         scene.addShape(plane);
     }
 
