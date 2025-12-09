@@ -1,4 +1,4 @@
-package org.example;
+package org.example.math;
 
 /**
  * Représente la caméra dans la scène 3D
@@ -11,7 +11,11 @@ public class Camera {
     private double fov;      // Angle de vue en degrés (field of view)
 
     /**
-     * Constructeur complet
+     * Constructeur complet.
+     * @param lookFrom position de l'œil
+     * @param lookAt point visé
+     * @param up vecteur «haut» de référence
+     * @param fov angle de vue en degrés
      */
     public Camera(Point lookFrom, Point lookAt, Vector up, double fov) {
         this.lookFrom = lookFrom;
@@ -22,36 +26,60 @@ public class Camera {
 
     // ========== GETTERS ==========
 
+    /**
+     * Retourne la position de la caméra.
+     */
     public Point getLookFrom() {
         return lookFrom;
     }
 
+    /**
+     * Retourne le point regardé par la caméra.
+     */
     public Point getLookAt() {
         return lookAt;
     }
 
+    /**
+     * Retourne le vecteur «haut».
+     */
     public Vector getUp() {
         return up;
     }
 
+    /**
+     * Retourne l'angle de vue (degrés).
+     */
     public double getFov() {
         return fov;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit la position de la caméra.
+     */
     public void setLookFrom(Point lookFrom) {
         this.lookFrom = lookFrom;
     }
 
+    /**
+     * Définit le point visé.
+     */
     public void setLookAt(Point lookAt) {
         this.lookAt = lookAt;
     }
 
+    /**
+     * Définit le vecteur «haut».
+     */
     public void setUp(Vector up) {
         this.up = up;
     }
 
+    /**
+     * Définit l'angle de vue (degrés).
+     */
     public void setFov(double fov) {
         this.fov = fov;
     }
@@ -64,40 +92,3 @@ public class Camera {
                 ", fov=" + fov + "°}";
     }
 }
-
-
-/*
-public class Camera {
-    private double x, y, z; // Position de l'œil
-    private double u, v, w; // Point visé
-    private double m, n, o; // Direction vers le haut
-    private double fov; // Angle de vue
-
-    // Constructeur
-    public Camera(double x, double y, double z, double u, double v, double w, double m, double n, double o, double fov) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.u = u;
-        this.v = v;
-        this.w = w;
-        this.m = m;
-        this.n = n;
-        this.o = o;
-        this.fov = fov;
-    }
-
-    // Getters
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getZ() { return z; }
-    public double getU() { return u; }
-    public double getV() { return v; }
-    public double getW() { return w; }
-    public double getM() { return m; }
-    public double getN() { return n; }
-    public double getO() { return o; }
-    public double getFov() { return fov; }
-}
-
- */

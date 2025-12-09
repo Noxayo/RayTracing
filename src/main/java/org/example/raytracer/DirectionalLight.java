@@ -1,8 +1,8 @@
 package org.example.raytracer;
 
-import org.example.AbstractVec3;
-import org.example.Color;
-import org.example.Vector;
+import org.example.math.AbstractVec3;
+import org.example.math.Color;
+import org.example.math.Vector;
 
 /**
  * Lumière directionnelle (comme le soleil)
@@ -29,12 +29,18 @@ public class DirectionalLight extends AbstractLight {
 
     // ========== GETTERS ==========
 
+    /**
+     * Retourne la direction (normalisée et inversée lors de la construction).
+     */
     public Vector getDirection() {
         return direction;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit la direction de la lumière.
+     */
     public void setDirection(Vector direction) {
         this.direction = direction;
     }

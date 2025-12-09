@@ -1,6 +1,6 @@
 package org.example.raytracer;
 
-import org.example.Color;
+import org.example.math.Color;
 
 /**
  * Classe abstraite représentant une source de lumière
@@ -19,12 +19,18 @@ public abstract class AbstractLight {
 
     // ========== GETTERS ==========
 
+    /**
+     * Retourne la couleur de la lumière.
+     */
     public Color getColor() {
         return color;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit la couleur de la lumière.
+     */
     public void setColor(Color color) {
         this.color = color;
     }

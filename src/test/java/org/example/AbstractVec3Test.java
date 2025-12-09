@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.math.AbstractVec3;
+
 // This test class uses JUnit 5.
 // You'll need to have the JUnit Jupiter API in your project dependencies.
 

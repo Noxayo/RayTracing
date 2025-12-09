@@ -1,6 +1,6 @@
 package org.example.geometry;
 
-import org.example.Color;
+import org.example.math.Color;
 
 /**
  * Classe abstraite représentant une forme géométrique
@@ -27,28 +27,50 @@ public abstract class Shape {
 
     // ========== GETTERS ==========
 
+    /**
+     * Couleur diffuse de la forme.
+     */
     public Color getDiffuse() {
         return diffuse;
     }
 
+    /**
+     * Couleur spéculaire (utilisée pour la réflexion/Phong).
+     */
     public Color getSpecular() {
         return specular;
     }
 
+    /**
+     * Exposant de brillance de Phong.
+     */
     public double getShininess() { return shininess; }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit la couleur diffuse.
+     */
     public void setDiffuse(Color diffuse) {
         this.diffuse = diffuse;
     }
 
+    /**
+     * Définit la couleur spéculaire.
+     */
     public void setSpecular(Color specular) {
         this.specular = specular;
     }
 
+    /**
+     * Définit l'exposant de brillance.
+     */
     public void setShininess(double shininess) { this.shininess = shininess; }
 
-    // Intersection API for Step 3
+    /**
+     * Calcule l'intersection entre cette forme et un rayon.
+     * @param ray le rayon à tester
+     * @return l'intersection trouvée ou null si aucune
+     */
     public abstract org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray);
 }

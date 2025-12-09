@@ -1,7 +1,7 @@
 package org.example.geometry;
 
-import org.example.Color;
-import org.example.Point;
+import org.example.math.Color;
+import org.example.math.Point;
 
 /**
  * Représente un triangle défini par 3 sommets
@@ -29,28 +29,46 @@ public class Triangle extends Shape {
 
     // ========== GETTERS ==========
 
+    /**
+     * Premier sommet du triangle.
+     */
     public Point getV0() {
         return v0;
     }
 
+    /**
+     * Deuxième sommet du triangle.
+     */
     public Point getV1() {
         return v1;
     }
 
+    /**
+     * Troisième sommet du triangle.
+     */
     public Point getV2() {
         return v2;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit le premier sommet.
+     */
     public void setV0(Point v0) {
         this.v0 = v0;
     }
 
+    /**
+     * Définit le deuxième sommet.
+     */
     public void setV1(Point v1) {
         this.v1 = v1;
     }
 
+    /**
+     * Définit le troisième sommet.
+     */
     public void setV2(Point v2) {
         this.v2 = v2;
     }
@@ -65,35 +83,11 @@ public class Triangle extends Shape {
     }
 
     @Override
+    /**
+     * Intersection rayon-triangle (déléguée à Intersection).
+     */
     public org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray) {
-        // Möller–Trumbore algorithm
-        org.example.AbstractVec3 V = new org.example.AbstractVec3();
-        double[] O = ray.getOrigin();
-        double[] D = ray.getDirection();
-        double[] A = v0.getPoint();
-        double[] B = v1.getPoint();
-        double[] C = v2.getPoint();
-
-        double[] e1 = V.subtraction(B, A);
-        double[] e2 = V.subtraction(C, A);
-        double[] pvec = V.vectorialProduct(D, e2);
-        double det = V.scalarProduct(e1, pvec);
-        if (Math.abs(det) < 1e-8) return null;
-        double invDet = 1.0 / det;
-
-        double[] tvec = V.subtraction(O, A);
-        double u = V.scalarProduct(tvec, pvec) * invDet;
-        if (u < 0 || u > 1) return null;
-
-        double[] qvec = V.vectorialProduct(tvec, e1);
-        double v = V.scalarProduct(D, qvec) * invDet;
-        if (v < 0 || u + v > 1) return null;
-
-        double t = V.scalarProduct(e2, qvec) * invDet;
-        if (t <= 1e-6) return null;
-
-        double[] P = V.addition(O, V.multiplicationByScalar(t, D));
-        double[] N = V.normalization(V.vectorialProduct(e1, e2));
-        return new org.example.raytracer.Intersection(this, t, P, N);
+        // Délègue au helper centralisé dans Intersection
+        return org.example.raytracer.Intersection.intersectTriangle(this, ray);
     }
 }
