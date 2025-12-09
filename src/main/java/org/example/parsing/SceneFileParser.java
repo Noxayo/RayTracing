@@ -1,8 +1,8 @@
 package org.example.parsing;
 
-import org.example.*;
-import org.example.Camera;
-import org.example.Scene;
+import org.example.math.*;
+import org.example.math.Camera;
+import org.example.math.Scene;
 import org.example.geometry.Plane;
 import org.example.geometry.Sphere;
 import org.example.geometry.Triangle;

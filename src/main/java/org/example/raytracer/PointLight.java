@@ -1,7 +1,7 @@
 package org.example.raytracer;
 
-import org.example.Color;
-import org.example.Point;
+import org.example.math.Color;
+import org.example.math.Point;
 
 /**
  * Lumière ponctuelle (comme une ampoule)
@@ -23,12 +23,18 @@ public class PointLight extends AbstractLight {
 
     // ========== GETTERS ==========
 
+    /**
+     * Retourne la position de la lumière.
+     */
     public Point getPosition() {
         return position;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit la position de la lumière.
+     */
     public void setPosition(Point position) {
         this.position = position;
     }

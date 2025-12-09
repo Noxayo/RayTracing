@@ -1,16 +1,28 @@
 package org.example.raytracer;
 
-import org.example.Color;
+import org.example.math.Color;
 import org.example.geometry.Shape;
 
+/**
+ * Représente une intersection rayon-objet et fournit des utilitaires
+ * pour tester l'intersection avec différentes géométries ainsi que
+ * le calcul d'éclairage (diffus/spéculaire) et la réflexion (jalon 6).
+ */
 public class Intersection {
     private final Shape shape;
     private final double t;
     private final double[] point;
-    private final double[] normal; // normalized
+    private final double[] normal; // normalisée
     // L'AbstractVec3 pour tous les calculs
-    private final org.example.AbstractVec3 V = new org.example.AbstractVec3();
+    private final org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
 
+    /**
+     * Constructeur d'une intersection.
+     * @param shape forme touchée
+     * @param t paramètre le long du rayon
+     * @param point point d'impact
+     * @param normal normale au point d'impact (normalisée)
+     */
     public Intersection(Shape shape, double t, double[] point, double[] normal) {
         this.shape = shape;
         this.t = t;
@@ -18,10 +30,110 @@ public class Intersection {
         this.normal = normal;
     }
 
+    /** Retourne la forme intersectée. */
     public Shape getShape() { return shape; }
+    /** Retourne la distance paramétrique le long du rayon. */
     public double getT() { return t; }
+    /** Retourne le point d'impact. */
     public double[] getPoint() { return point; }
+    /** Retourne la normale (normalisée). */
     public double[] getNormal() { return normal; }
+
+    // --- Aides d'intersection spécifiques à la géométrie (centralisées) ---
+    /**
+     * Test d'intersection rayon-triangle (Möller–Trumbore).
+     * @param tri triangle
+     * @param ray rayon
+     * @return intersection ou null
+     */
+    public static org.example.raytracer.Intersection intersectTriangle(
+            org.example.geometry.Triangle tri,
+            org.example.raytracer.Ray ray) {
+        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
+        double[] O = ray.getOrigin();
+        double[] D = ray.getDirection();
+        double[] A = tri.getV0().getPoint();
+        double[] B = tri.getV1().getPoint();
+        double[] C = tri.getV2().getPoint();
+
+        double[] e1 = V.subtraction(B, A);
+        double[] e2 = V.subtraction(C, A);
+        double[] pvec = V.vectorialProduct(D, e2);
+        double det = V.scalarProduct(e1, pvec);
+        if (Math.abs(det) < 1e-8) return null;
+        double invDet = 1.0 / det;
+
+        double[] tvec = V.subtraction(O, A);
+        double u = V.scalarProduct(tvec, pvec) * invDet;
+        if (u < 0 || u > 1) return null;
+
+        double[] qvec = V.vectorialProduct(tvec, e1);
+        double v = V.scalarProduct(D, qvec) * invDet;
+        if (v < 0 || u + v > 1) return null;
+
+        double t = V.scalarProduct(e2, qvec) * invDet;
+        if (t <= 1e-6) return null;
+
+        double[] P = V.addition(O, V.multiplicationByScalar(t, D));
+        double[] N = V.normalization(V.vectorialProduct(e1, e2));
+        return new org.example.raytracer.Intersection(tri, t, P, N);
+    }
+
+    /**
+     * Test d'intersection rayon-sphère.
+     * @param sph sphère
+     * @param ray rayon
+     * @return intersection ou null
+     */
+    public static org.example.raytracer.Intersection intersectSphere(
+            org.example.geometry.Sphere sph,
+            org.example.raytracer.Ray ray) {
+        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
+        double[] origin = ray.getOrigin();
+        double[] dir = ray.getDirection();
+        double[] C = sph.getCenter().getPoint();
+        double radius = sph.getRadius();
+        double[] oc = V.subtraction(origin, C);
+        double a = V.scalarProduct(dir, dir);
+        double b = 2.0 * V.scalarProduct(oc, dir);
+        double c = V.scalarProduct(oc, oc) - radius * radius;
+        double disc = b * b - 4 * a * c;
+        if (disc < 0) return null;
+        double sqrtD = Math.sqrt(disc);
+        double t1 = (-b - sqrtD) / (2 * a);
+        double t2 = (-b + sqrtD) / (2 * a);
+        double t = Double.POSITIVE_INFINITY;
+        if (t1 > 1e-6) t = Math.min(t, t1);
+        if (t2 > 1e-6) t = Math.min(t, t2);
+        if (t == Double.POSITIVE_INFINITY) return null;
+        double[] point = V.addition(origin, V.multiplicationByScalar(t, dir));
+        double[] normal = V.normalization(V.subtraction(point, C));
+        return new org.example.raytracer.Intersection(sph, t, point, normal);
+    }
+
+    /**
+     * Test d'intersection rayon-plan.
+     * @param pl plan
+     * @param ray rayon
+     * @return intersection ou null
+     */
+    public static org.example.raytracer.Intersection intersectPlane(
+            org.example.geometry.Plane pl,
+            org.example.raytracer.Ray ray) {
+        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
+        double[] origin = ray.getOrigin();
+        double[] dir = ray.getDirection();
+        double[] P0 = pl.getPoint().getPoint();
+        double[] N = pl.getNormal().getVector();
+
+        double denom = V.scalarProduct(N, dir);
+        if (Math.abs(denom) < 1e-8) return null;
+        double t = V.scalarProduct(V.subtraction(P0, origin), N) / denom;
+        if (t <= 1e-6) return null;
+        double[] hitPoint = V.addition(origin, V.multiplicationByScalar(t, dir));
+        double[] n = V.normalization(N);
+        return new org.example.raytracer.Intersection(pl, t, hitPoint, n);
+    }
 
     // Dans Intersection.java (REMPLACEZ l'ancienne méthode computeColor)
 
@@ -32,7 +144,7 @@ public class Intersection {
      * @param depth La profondeur de récursion actuelle (commence à 1)
      * @return La couleur finale
      */
-    public org.example.Color computeColor(org.example.Scene scene, double[] origin, int depth) {
+    public org.example.math.Color computeColor(org.example.math.Scene scene, double[] origin, int depth) {
 
         double[] N = normal;
 
@@ -73,20 +185,20 @@ public class Intersection {
                 continue;
             }
 
-            // Shadow ray: offset point slightly along normal to avoid self-intersection
+            // Rayon d'ombre : décaler légèrement le point le long de la normale pour éviter l'auto-intersection
             double[] shadowOrigin = V.addition(point, V.multiplicationByScalar(1e-4, N));
             org.example.raytracer.Ray shadowRay = new org.example.raytracer.Ray(shadowOrigin, L);
             if (isOccluded(scene, shadowRay, maxDist)) {
-                continue; // in shadow for this light
+                continue; // dans l'ombre pour cette lumière
             }
 
-            // Diffuse (Lambert)
+            // Diffus (Lambert)
             double ndotl = Math.max(0.0, V.scalarProduct(N, L));
             r = clamp01(r + baseArr[0] * lightColor[0] * ndotl);
             g = clamp01(g + baseArr[1] * lightColor[1] * ndotl);
             b = clamp01(b + baseArr[2] * lightColor[2] * ndotl);
 
-            // Specular (Phong)
+            // Spéculaire (Phong)
             if (shininess > 0) {
                 double[] minusL = V.multiplicationByScalar(-1.0, L);
                 //  CORRECTION JALON 6: reflect est maintenant dans V (AbstractVec3)
@@ -103,11 +215,11 @@ public class Intersection {
         // =========================================================
 
         // Stocker la couleur directe dans un objet modifiable (nécessaire pour la fonction add/multiply)
-        org.example.Color finalColor = new org.example.Color(r, g, b);
+        org.example.math.Color finalColor = new org.example.math.Color(r, g, b);
 
         // --- LOGIQUE DE RÉFLEXION (Jalon 6) ---
         int maxDepth = scene.getMaxdepth();
-        org.example.Color specular = shape.getSpecular();
+        org.example.math.Color specular = shape.getSpecular();
 
         // Condition d'arrêt : profondeur max atteinte OU l'objet n'est pas spéculaire
         if (depth < maxDepth && !specular.isBlack()) {
@@ -124,7 +236,7 @@ public class Intersection {
 
             if (hitPrime != null) {
                 // 4. Appel récursif : calcule la couleur vue par le rayon réfléchi (c')
-                org.example.Color reflectedColor = hitPrime.computeColor(scene, point, depth + 1);
+                org.example.math.Color reflectedColor = hitPrime.computeColor(scene, point, depth + 1);
 
                 // 5. Ajouter la contribution: c = c + specular * c'
                 Color reflectedContribution = reflectedColor.multiply(specular);
@@ -218,9 +330,9 @@ public class Intersection {
 //    }
 
 // ... (conservez la méthode isOccluded et clamp01 en bas de la classe)
-    /*// Compute color at the intersection according to scene lighting
+    /*// Calcule la couleur à l'intersection selon l'éclairage de la scène
     public org.example.Color computeColor(org.example.Scene scene, double[] eye) {
-        org.example.AbstractVec3 V = new org.example.AbstractVec3();
+        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
         double[] N = normal;
         double[] viewDir = V.normalization(V.subtraction(eye, point));
 
@@ -249,11 +361,11 @@ public class Intersection {
                 continue;
             }
 
-            // Shadow ray: offset point slightly along normal to avoid self-intersection
+            // Rayon d'ombre : décaler légèrement le point le long de la normale pour éviter l'auto-intersection
             double[] shadowOrigin = V.addition(point, V.multiplicationByScalar(1e-4, N));
             org.example.raytracer.Ray shadowRay = new org.example.raytracer.Ray(shadowOrigin, L);
             if (isOccluded(scene, shadowRay, maxDist)) {
-                continue; // in shadow for this light
+                continue; // dans l'ombre pour cette lumière
             }
 
             double ndotl = Math.max(0.0, V.scalarProduct(N, L));
@@ -261,7 +373,7 @@ public class Intersection {
             g = clamp01(g + baseArr[1] * lightColor[1] * ndotl);
             b = clamp01(b + baseArr[2] * lightColor[2] * ndotl);
 
-            // Specular (Phong)
+            // Spéculaire (Phong)
             if (shininess > 0) {
                 double[] minusL = V.multiplicationByScalar(-1.0, L);
                 double[] R = reflect(minusL, N, V);
@@ -276,8 +388,15 @@ public class Intersection {
         return new org.example.Color(r, g, b);
     }*/
 
-    private boolean isOccluded(org.example.Scene scene, org.example.raytracer.Ray ray, double maxDist) {
-        org.example.AbstractVec3 V = new org.example.AbstractVec3();
+    /**
+     * Teste l'occlusion d'un point par un objet entre le point et la lumière.
+     * @param scene scène
+     * @param ray rayon d'ombre
+     * @param maxDist distance maximale à considérer (point lights)
+     * @return true si occlus
+     */
+    private boolean isOccluded(org.example.math.Scene scene, org.example.raytracer.Ray ray, double maxDist) {
+        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
         for (Shape s : scene.getShapes()) {
             Intersection h = s.intersect(ray);
             if (h != null) {
@@ -294,7 +413,10 @@ public class Intersection {
      * @param ray Le rayon secondaire (réfléchi)
      * @return L'intersection la plus proche (peut être null)
      */
-    private org.example.raytracer.Intersection findClosestIntersection(org.example.Scene scene, org.example.raytracer.Ray ray) {
+    /**
+     * Trouve l'intersection valide la plus proche pour un rayon donné.
+     */
+    private org.example.raytracer.Intersection findClosestIntersection(org.example.math.Scene scene, org.example.raytracer.Ray ray) {
         double closestT = Double.POSITIVE_INFINITY;
         Intersection best = null;
         for (org.example.geometry.Shape s : scene.getShapes()) {

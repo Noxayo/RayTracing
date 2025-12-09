@@ -1,4 +1,4 @@
-package org.example;
+package org.example.math;
 
 import org.example.geometry.Shape;
 import org.example.raytracer.AbstractLight;
@@ -15,7 +15,7 @@ public class Scene {
     // ========== ATTRIBUTS OBLIGATOIRES ==========
     private int width;              // Largeur de l'image
     private int height;             // Hauteur de l'image
-    private org.example.Camera camera;          // La caméra
+    private Camera camera;          // La caméra
 
     // ========== ATTRIBUTS OPTIONNELS ==========
     private String output = "output.png";           // Nom du fichier de sortie
@@ -54,7 +54,7 @@ public class Scene {
         return height;
     }
 
-    public org.example.Camera getCamera() {
+    public Camera getCamera() {
         return camera;
     }
 
@@ -108,7 +108,7 @@ public class Scene {
         this.height = height;
     }
 
-    public void setCamera(org.example.Camera camera) {
+    public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
@@ -185,49 +185,4 @@ public class Scene {
         // Délègue le calcul à l'Intersection, en passant la profondeur
         return intersection.computeColor(this, origin, depth);
     }
-    /*
-    /**
-     * Calcule la couleur au point d'intersection donné, selon l'éclairage de la scène.
-     * Délègue au calcul défini côté Intersection pour respecter le jalon.
-
-    public Color computeColor(org.example.raytracer.Intersection intersection, double[] eye) {
-        return intersection.computeColor(this, eye);
-    }
-    */
-
 }
-/* import java.util.ArrayList;
-import java.util.List;
-
-public class Scene {
-    private int width;
-    private int height;
-    private String output = "output.png";
-    private Camera camera;
-    private Color ambient;
-    private List<Light> lights = new ArrayList<>();
-    private List<Shape> shapes = new ArrayList<>();
-
-    // Getters et Setters
-    public int getWidth() { return width; }
-    public void setWidth(int width) { this.width = width; }
-
-    public int getHeight() { return height; }
-    public void setHeight(int height) { this.height = height; }
-
-    public String getOutput() { return output; }
-    public void setOutput(String output) { this.output = output; }
-
-    public Camera getCamera() { return camera; }
-    public void setCamera(Camera camera) { this.camera = camera; }
-
-    public Color getAmbient() { return ambient; }
-    public void setAmbient(Color ambient) { this.ambient = ambient; }
-
-    public List<Light> getLights() { return lights; }
-    public void setLights(List<Light> lights) { this.lights = lights; }
-
-    public List<Shape> getShapes() { return shapes; }
-    public void setShapes(List<Shape> shapes) { this.shapes = shapes; }
-}
-*/

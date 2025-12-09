@@ -1,8 +1,8 @@
 package org.example.geometry;
 
-import org.example.Color;
-import org.example.Point;
-import org.example.Vector;
+import org.example.math.Color;
+import org.example.math.Point;
+import org.example.math.Vector;
 
 /**
  * Représente un plan infini
@@ -27,20 +27,32 @@ public class Plane extends Shape {
 
     // ========== GETTERS ==========
 
+    /**
+     * Retourne un point appartenant au plan.
+     */
     public Point getPoint() {
         return point;
     }
 
+    /**
+     * Retourne la normale du plan (non normalisée).
+     */
     public Vector getNormal() {
         return normal;
     }
 
     // ========== SETTERS ==========
 
+    /**
+     * Définit un point du plan.
+     */
     public void setPoint(Point point) {
         this.point = point;
     }
 
+    /**
+     * Définit la normale du plan.
+     */
     public void setNormal(Vector normal) {
         this.normal = normal;
     }
@@ -54,19 +66,10 @@ public class Plane extends Shape {
     }
 
     @Override
+    /**
+     * Intersection rayon-plan (déléguée à Intersection).
+     */
     public org.example.raytracer.Intersection intersect(org.example.raytracer.Ray ray) {
-        org.example.AbstractVec3 V = new org.example.AbstractVec3();
-        double[] origin = ray.getOrigin();
-        double[] dir = ray.getDirection();
-        double[] P0 = point.getPoint();
-        double[] N = normal.getVector();
-
-        double denom = V.scalarProduct(N, dir);
-        if (Math.abs(denom) < 1e-8) return null; // parallel
-        double t = V.scalarProduct(V.subtraction(P0, origin), N) / denom;
-        if (t <= 1e-6) return null;
-        double[] hitPoint = V.addition(origin, V.multiplicationByScalar(t, dir));
-        double[] n = V.normalization(N);
-        return new org.example.raytracer.Intersection(this, t, hitPoint, n);
+        return org.example.raytracer.Intersection.intersectPlane(this, ray);
     }
 }
