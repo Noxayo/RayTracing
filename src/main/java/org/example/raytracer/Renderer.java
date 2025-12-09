@@ -68,8 +68,17 @@ public class Renderer {
         if (hit == null) {
             return new Color(0, 0, 0);
         }
-        return scene.computeColor(hit, origin);
+        // Appel initial avec profondeur 1
+        return scene.computeColor(hit, origin, 1); // ANCIEN: return scene.computeColor(hit, origin);
     }
+    /* Ancienne méthode pour jalon 5 private Color trace(Scene scene, double[] origin, double[] dir) {
+
+        Intersection hit = nearestHit(scene, origin, dir);
+        if (hit == null) {
+            return new Color(0, 0, 0);
+        }
+        return scene.computeColor(hit, origin);
+    }*/
 
     private Intersection nearestHit(Scene scene, double[] origin, double[] dir) {
         double closestT = Double.POSITIVE_INFINITY;

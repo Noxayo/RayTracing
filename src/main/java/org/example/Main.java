@@ -24,7 +24,7 @@ import java.util.Arrays;
     public class Main {
         public static void main(String[] args) {
             System.out.println("========================================");
-            System.out.println("   PARSING + RENDER - JALON 3");
+            System.out.println("   Generation d'images incoming");
             System.out.println("========================================\n");
 
             // Créer le parser
@@ -32,7 +32,7 @@ import java.util.Arrays;
 
             try {
                 // chemin de fichier .scene (j'ai toujours le message que le chemin d'accès marche pas)
-                String sceneFile = "src/main/java/Scenes/tp45.test";
+                String sceneFile = "src/main/java/Scenes/final_avec_bonus.scene";
 
                 System.out.println(" Lecture du fichier: " + sceneFile);
                 System.out.println("...\n");
@@ -90,7 +90,7 @@ import java.util.Arrays;
                     System.err.println(" Échec d'écriture de l'image: " + io.getMessage());
                 }
                 System.out.println("\n========================================");
-                System.out.println(" JALON 3 TERMINÉ AVEC SUCCÈS !");
+                System.out.println(" Scène générée !");
                 System.out.println("========================================\n");
 
             } catch (Exception e) {

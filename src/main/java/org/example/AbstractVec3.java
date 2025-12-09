@@ -97,5 +97,23 @@ public class AbstractVec3 {
 
         return result;
     }
+    /** JALON 6 BONUS
+     * Calcule le vecteur réfléchi R pour un vecteur incident D et une normale N.
+     * Formule: R = D - 2 * (D . N) * N
+     * D est la direction du rayon incident (ray.getDirection()).
+     * @param incident Direction du rayon (D)
+     * @param normal La normale à la surface (N)
+     * @return Le vecteur réfléchi R
+     */
+    public double[] reflect(double[] incident, double[] normal) {
+        // 1. Calculer le produit scalaire (D . N)
+        double dotProduct = scalarProduct(incident, normal);
 
+        // 2. Calculer 2 * (D . N) * N
+        double factor = 2.0 * dotProduct;
+        double[] scaledNormal = multiplicationByScalar(factor, normal);
+
+        // 3. Calculer R = D - (2 * (D . N) * N)
+        return subtraction(incident, scaledNormal);
+    }
 }

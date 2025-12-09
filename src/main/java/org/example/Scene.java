@@ -35,6 +35,8 @@ public class Scene {
     private List<Point> vertices = new ArrayList<>();  // Liste des sommets (vertex)
     private int maxVerts = 0;                         // Nombre max de vertices attendus
 
+    // ATTRIBUT POUR LE JALON 6
+    private int maxdepth = 1; // Profondeur max de récursion (1 par défaut = pas de réflexion)
 
     // ========== CONSTRUCTEUR ==========
     public Scene() {
@@ -92,7 +94,10 @@ public class Scene {
         return maxVerts;
     }
 
-
+    // Maxdepth pour la scene du jalon 6
+    public int getMaxdepth() {
+        return maxdepth;
+    }
     // ========== SETTERS ==========
 
     public void setWidth(int width) {
@@ -131,7 +136,9 @@ public class Scene {
         this.maxVerts = maxVerts;
     }
 
-
+    public void setMaxdepth(int maxdepth) {
+        this.maxdepth = maxdepth;
+    }
     // ========== MÉTHODES UTILES ==========
 
     /**
@@ -167,14 +174,27 @@ public class Scene {
                 ", shapes=" + shapes.size() +
                 '}';
     }
-
+    /**
+     * Calcule la couleur à l'intersection. Mis à jour pour la récursion.
+     * @param intersection L'intersection trouvée.
+     * @param origin Le point d'où vient le rayon (œil ou intersection précédente).
+     * @param depth La profondeur de récursion actuelle.
+     * @return La couleur calculée.
+     */
+    public Color computeColor(org.example.raytracer.Intersection intersection, double[] origin, int depth) {
+        // Délègue le calcul à l'Intersection, en passant la profondeur
+        return intersection.computeColor(this, origin, depth);
+    }
+    /*
     /**
      * Calcule la couleur au point d'intersection donné, selon l'éclairage de la scène.
      * Délègue au calcul défini côté Intersection pour respecter le jalon.
-     */
+
     public Color computeColor(org.example.raytracer.Intersection intersection, double[] eye) {
         return intersection.computeColor(this, eye);
     }
+    */
+
 }
 /* import java.util.ArrayList;
 import java.util.List;

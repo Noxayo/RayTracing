@@ -1,5 +1,6 @@
 package org.example.raytracer;
 
+import org.example.AbstractVec3;
 import org.example.Color;
 import org.example.Vector;
 
@@ -18,7 +19,12 @@ public class DirectionalLight extends AbstractLight {
      */
     public DirectionalLight(Vector direction, Color color) {
         super(color);
-        this.direction = direction;
+        // INVERSER la direction
+        AbstractVec3 calc = new AbstractVec3();
+        double[] dirArray = direction.getVector();
+        double[] normalized = calc.normalization(dirArray);
+        double[] inverted = calc.multiplicationByScalar(-1.0, normalized);
+        this.direction = new Vector(inverted[0], inverted[1], inverted[2]);
     }
 
     // ========== GETTERS ==========

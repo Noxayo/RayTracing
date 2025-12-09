@@ -126,6 +126,49 @@ public class Color {
                 + ((green & 0xff) << 8)
                 + (blue & 0xff);
     }
+    /**
+     * Assure que toutes les composantes de la couleur sont plafonnées à 1.0.
+     */
+    public void clamp() {
+        this.color[0] = Math.min(this.color[0], 1.0);
+        this.color[1] = Math.min(this.color[1], 1.0);
+        this.color[2] = Math.min(this.color[2], 1.0);
+    }
+
+    /**
+     * Multiplie cette couleur par une autre (produit de Schur).
+     * @param c L'autre couleur (ex: specular)
+     * @return Une nouvelle couleur résultant de la multiplication
+     */
+    public Color multiply(Color c) {
+        double[] c2 = c.getColor();
+        return new Color(
+                this.color[0] * c2[0],
+                this.color[1] * c2[1],
+                this.color[2] * c2[2]
+        );
+    }
+
+    /**
+     * Ajoute une autre couleur à celle-ci. Modifie cette instance.
+     * @param c L'autre couleur à ajouter
+     */
+    public void add(Color c) {
+        double[] c2 = c.getColor();
+        this.color[0] += c2[0];
+        this.color[1] += c2[1];
+        this.color[2] += c2[2];
+    }
+
+    /**
+     * Vérifie si la couleur est noire (toutes composantes à zéro ou très proches).
+     * Utilisé pour déterminer si la réflexion doit être calculée (specular non noire).
+     * @return true si la couleur est noire.
+     */
+    public boolean isBlack() {
+        final double EPSILON = 1e-6;
+        return (this.color[0] < EPSILON && this.color[1] < EPSILON && this.color[2] < EPSILON);
+    }
 }
 
 

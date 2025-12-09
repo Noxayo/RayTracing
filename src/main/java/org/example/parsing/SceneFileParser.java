@@ -113,6 +113,20 @@ public class SceneFileParser {
         else if (command.equals("plane")) {
             parsePlane(tokens, scene);
         }
+        else if (command.equals("point")) {
+            parsePointLight(tokens, scene);
+        }
+        else if (command.equals("sphere")) {
+            parseSphere(tokens, scene);
+        }
+        //  NOUVELLE COMMANDE POUR LE JALON 6
+        else if (command.equals("maxdepth")) {
+            parseMaxDepth(tokens, scene);
+        }
+        // ------------------------------------
+        else if (command.equals("maxverts")) {
+            parseMaxVerts(tokens, scene);
+        }
         else {
             throw new IllegalArgumentException("Commande inconnue: " + command);
         }
@@ -415,7 +429,25 @@ public class SceneFileParser {
         plane.setShininess(scene.getCurrentShininess());
         scene.addShape(plane);
     }
+    /**
+     * Parse: maxdepth X
+     * Définit la profondeur de récursion maximale pour la réflexion.
+     */
+    private void parseMaxDepth(String[] tokens, Scene scene) {
+        if (tokens.length != 2) {
+            throw new IllegalArgumentException("maxdepth attend 1 paramètre (profondeur)");
+        }
 
+        try {
+            int depth = Integer.parseInt(tokens[1]);
+            if (depth < 1) {
+                throw new IllegalArgumentException("La profondeur maximale doit être >= 1");
+            }
+            scene.setMaxdepth(depth); // ⬅️ Ceci est la ligne clé
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Le paramètre de maxdepth doit être un entier valide");
+        }
+    }
     /**
      * Valide que la scène est complète et correcte
      */
