@@ -19,8 +19,16 @@ public class Renderer {
 
     /**
      * Rendre l'image de la scène et l'écrire dans le fichier de sortie.
-     * @param scene scène à rendre
-     * @throws IOException en cas d'erreur d'écriture du fichier
+     *
+     * Cette méthode implémente la boucle principale du Ray Tracer (Jalon 3) :
+     * 1. Calcul du repère orthonormé (u, v, w) de la caméra.
+     * 2. Itération sur chaque pixel (x, y) de l'image.
+     * 3. Calcul du vecteur direction (d) pour le rayon primaire.
+     * 4. Appel à trace() pour obtenir la couleur et gérer les intersections.
+     * 5. Sauvegarde de l'image au format PNG.
+     *
+     * @param scene La scène complète à rendre (y compris la caméra, les formes et les lumières).
+     * @throws IOException En cas d'erreur d'écriture du fichier de sortie.
      */
     public void render(Scene scene) throws IOException {
         int width = scene.getWidth();
@@ -97,14 +105,6 @@ public class Renderer {
         // Appel initial avec profondeur 1
         return scene.computeColor(hit, origin, 1); // ANCIEN: return scene.computeColor(hit, origin);
     }
-    /* Ancienne méthode pour jalon 5 private Color trace(Scene scene, double[] origin, double[] dir) {
-
-        Intersection hit = nearestHit(scene, origin, dir);
-        if (hit == null) {
-            return new Color(0, 0, 0);
-        }
-        return scene.computeColor(hit, origin);
-    }*/
 
     /**
      * Recherche l'intersection la plus proche dans la scène.

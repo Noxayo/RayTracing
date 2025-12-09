@@ -4,9 +4,9 @@ import org.example.math.Color;
 import org.example.geometry.Shape;
 
 /**
- * Représente une intersection rayon-objet et fournit des utilitaires
- * pour tester l'intersection avec différentes géométries ainsi que
- * le calcul d'éclairage (diffus/spéculaire) et la réflexion (jalon 6).
+ * Représente une intersection rayon-objet (Shape, t, point, normal) et centralise
+ * les utilitaires d'intersection spécifiques à la géométrie (Möller–Trumbore, Sphère/Plan)
+ * ainsi que l'algorithme d'éclairage récursif de la scène (Jalon 5 et Jalon 6).
  */
 public class Intersection {
     private final Shape shape;
@@ -80,10 +80,17 @@ public class Intersection {
     }
 
     /**
-     * Test d'intersection rayon-sphère.
-     * @param sph sphère
-     * @param ray rayon
-     * @return intersection ou null
+     * Teste l'intersection d'un rayon avec une sphère.
+     * * L'algorithme résout l'équation quadratique du second degré en t : a*t^2 + b*t + c = 0
+     * où a = D⋅D, b = 2 * (O-C)⋅D, et c = (O-C)⋅(O-C) - r^2
+     * * 1. Calcul du discriminant (Δ = b^2 - 4ac) pour déterminer le nombre de solutions
+     * 2. Si Δ > 0, deux intersections existent (t1 et t2)
+     * 3. La méthode sélectionne le t positif le plus petit (> 1e-6)
+     * 4. La normale (N) est calculée comme la direction (p - Centre) normalisée.
+     *
+     * @param sph La sphère à tester.
+     * @param ray Le rayon émis (origine O et direction D).
+     * @return L'objet Intersection pour l'impact valide le plus proche, ou null si aucune intersection n'est trouvée devant le rayon.
      */
     public static org.example.raytracer.Intersection intersectSphere(
             org.example.geometry.Sphere sph,
@@ -135,20 +142,20 @@ public class Intersection {
         return new org.example.raytracer.Intersection(pl, t, hitPoint, n);
     }
 
-    // Dans Intersection.java (REMPLACEZ l'ancienne méthode computeColor)
-
     /**
-     * Calcule la couleur à l'intersection, y compris la réflexion récursive (Jalon 6).
-     * @param scene La scène
-     * @param origin L'origine du rayon (œil ou intersection précédente)
-     * @param depth La profondeur de récursion actuelle (commence à 1)
-     * @return La couleur finale
+     * Calcule la couleur finale au point d'intersection.
+     * Implémente la lumière directe (Lambert/Phong/Ombres) et la contribution de la réflexion récursive.
+     * * @param scene La scène (pour accès aux lumières et maxdepth).
+     * @param origin L'origine du rayon (œil ou intersection précédente).
+     * @param depth La profondeur de récursion actuelle (commence à 1 pour le rayon primaire).
+     * @return La couleur finale, plafonnée à [1, 1, 1].
      */
     public org.example.math.Color computeColor(org.example.math.Scene scene, double[] origin, int depth) {
 
         double[] N = normal;
 
-        // 1. Calcul de D (Direction du rayon INCIDENT: origine -> point)
+        // 1. Calcul des vecteurs nécessaires
+        // D : Direction du rayon INCIDENT (utilisée pour la réflexion)
         double[] D = V.normalization(V.subtraction(point, origin));
 
         // 2. Calcul de viewDir (Direction de VUE pour Phong: point -> origin)
@@ -158,7 +165,7 @@ public class Intersection {
         double[] baseArr = shape.getDiffuse().getColor();
         double[] specArr = shape.getSpecular().getColor();
         double shininess = shape.getShininess();
-
+        // Initialisation de r, g, b avec la lumière ambiante
         double[] ambArr = scene.getAmbient().getColor();
         double r = clamp01(ambArr[0] * baseArr[0]);
         double g = clamp01(ambArr[1] * baseArr[1]);
@@ -198,10 +205,10 @@ public class Intersection {
             g = clamp01(g + baseArr[1] * lightColor[1] * ndotl);
             b = clamp01(b + baseArr[2] * lightColor[2] * ndotl);
 
-            // Spéculaire (Phong)
+            // Spéculaire (Phong) : Brillance, dépend de l'angle de vue
             if (shininess > 0) {
                 double[] minusL = V.multiplicationByScalar(-1.0, L);
-                //  CORRECTION JALON 6: reflect est maintenant dans V (AbstractVec3)
+                //  CORRECTION JALON 6: reflect est maintenant dans V (AbstractVec3) (On a essayé de bien affecter les fontions au bons endroits)
                 double[] R = V.reflect(minusL, N);
                 double rv = Math.max(0.0, V.scalarProduct(R, viewDir));
                 double spec = Math.pow(rv, shininess);
@@ -249,144 +256,6 @@ public class Intersection {
 
         return finalColor;
     }
-//
-//    // Dans Intersection.java
-//// REMPLACEZ l'ancienne méthode computeColor par celle-ci
-//
-//    /**
-//     * Calcule la couleur à l'intersection en incluant la lumière directe (Jalon 5)
-//     * et la lumière réfléchie (Jalon 6 Bonus) de manière récursive.
-//     * @param scene La scène
-//     * @param origin L'origine du rayon (œil ou intersection précédente)
-//     * @param depth La profondeur de récursion actuelle (commence à 1)
-//     * @return La couleur finale
-//     */
-//    public org.example.Color computeColor(org.example.Scene scene, double[] origin, int depth) {
-//        double[] N = normal;
-//
-//        // Direction du RAYON INCIDENT (point d'origine -> point d'intersection)
-//        // C'est ce vecteur que nous allons réfléchir
-//        double[] D = V.normalization(V.subtraction(point, origin));
-//
-//        // Direction de VUE (pour Phong) : point d'intersection -> œil
-//        double[] viewDir = V.normalization(V.subtraction(origin, point));
-//
-//        double[] baseArr = shape.getDiffuse().getColor();
-//        double[] specArr = shape.getSpecular().getColor();
-//        double shininess = shape.getShininess();
-//
-//        double[] ambArr = scene.getAmbient().getColor();
-//        double r = clamp01(ambArr[0] * baseArr[0]);
-//        double g = clamp01(ambArr[1] * baseArr[1]);
-//        double b = clamp01(ambArr[2] * baseArr[2]);
-//
-//        // --- CALCUL DE LA COULEUR DIRECTE (Diffuse + Specular) ---
-//        for (org.example.raytracer.AbstractLight light : scene.getLights()) {
-//            // [CODE JALON 5 EXISTANT] :
-//            // Détermination de L (direction/position lumière)
-//            // Calcul des ombres (isOccluded)
-//            // Calcul des contributions Diffuse et Specular (qui ajoutent à r, g, b)
-//            // Assurez-vous que votre Jalon 5 fonctionne ici et que r, g, b contiennent
-//            // la couleur après la lumière directe.
-//
-//            // Exemple simplifié (à remplacer par votre code Jalon 5 complet)
-//            // double[] L = ...; // Direction de la lumière
-//            // if (!isOccluded(scene, new Ray(point, L), maxDist) {
-//            //     // Mise à jour de r, g, b pour Diffuse et Specular
-//            // }
-//        }
-//
-//        // Stocker la couleur directe dans un objet modifiable
-//        org.example.Color finalColor = new org.example.Color(r, g, b);
-//
-//        // --- LOGIQUE DE RÉFLEXION (Jalon 6) ---
-//
-//        // Condition d'arrêt : profondeur max atteinte OU l'objet n'est pas spéculaire
-//        if (depth < scene.getMaxdepth() && !shape.getSpecular().isBlack()) {
-//
-//            // 1. Calculer le vecteur réfléchi (R)
-//            double[] reflectedDir = V.reflect(D, N);
-//
-//            // 2. Créer le nouveau rayon (origine: le point d'intersection 'point')
-//            org.example.raytracer.Ray reflectedRay = new org.example.raytracer.Ray(point, reflectedDir);
-//
-//            // 3. Trouver la prochaine intersection
-//            org.example.raytracer.Intersection hitPrime = findClosestIntersection(scene, reflectedRay);
-//
-//            if (hitPrime != null) {
-//                // 4. Appel récursif (c')
-//                org.example.Color reflectedColor = hitPrime.computeColor(scene, point, depth + 1);
-//
-//                // 5. Ajouter la contribution: c = c + specular * c'
-//                Color reflectedContribution = reflectedColor.multiply(shape.getSpecular());
-//                finalColor.add(reflectedContribution);
-//            }
-//        }
-//
-//        // 6. Plafonnement final des couleurs (très important !)
-//        finalColor.clamp();
-//
-//        return finalColor;
-//    }
-
-// ... (conservez la méthode isOccluded et clamp01 en bas de la classe)
-    /*// Calcule la couleur à l'intersection selon l'éclairage de la scène
-    public org.example.Color computeColor(org.example.Scene scene, double[] eye) {
-        org.example.math.AbstractVec3 V = new org.example.math.AbstractVec3();
-        double[] N = normal;
-        double[] viewDir = V.normalization(V.subtraction(eye, point));
-
-        double[] baseArr = shape.getDiffuse().getColor();
-        double[] specArr = shape.getSpecular().getColor();
-        double shininess = shape.getShininess();
-
-        double[] ambArr = scene.getAmbient().getColor();
-        double r = clamp01(ambArr[0] * baseArr[0]);
-        double g = clamp01(ambArr[1] * baseArr[1]);
-        double b = clamp01(ambArr[2] * baseArr[2]);
-
-        for (org.example.raytracer.AbstractLight light : scene.getLights()) {
-            double[] L;
-            double[] lightColor = light.getColor().getColor();
-            double maxDist = Double.POSITIVE_INFINITY;
-            if (light instanceof org.example.raytracer.DirectionalLight dl) {
-                double[] dirL = dl.getDirection().getVector();
-                L = V.normalization(dirL);
-            } else if (light instanceof org.example.raytracer.PointLight pl) {
-                double[] lp = pl.getPosition().getPoint();
-                double[] toLight = V.subtraction(lp, point);
-                maxDist = V.length(toLight);
-                L = V.normalization(toLight);
-            } else {
-                continue;
-            }
-
-            // Rayon d'ombre : décaler légèrement le point le long de la normale pour éviter l'auto-intersection
-            double[] shadowOrigin = V.addition(point, V.multiplicationByScalar(1e-4, N));
-            org.example.raytracer.Ray shadowRay = new org.example.raytracer.Ray(shadowOrigin, L);
-            if (isOccluded(scene, shadowRay, maxDist)) {
-                continue; // dans l'ombre pour cette lumière
-            }
-
-            double ndotl = Math.max(0.0, V.scalarProduct(N, L));
-            r = clamp01(r + baseArr[0] * lightColor[0] * ndotl);
-            g = clamp01(g + baseArr[1] * lightColor[1] * ndotl);
-            b = clamp01(b + baseArr[2] * lightColor[2] * ndotl);
-
-            // Spéculaire (Phong)
-            if (shininess > 0) {
-                double[] minusL = V.multiplicationByScalar(-1.0, L);
-                double[] R = reflect(minusL, N, V);
-                double rv = Math.max(0.0, V.scalarProduct(R, viewDir));
-                double spec = Math.pow(rv, shininess);
-                r = clamp01(r + specArr[0] * lightColor[0] * spec);
-                g = clamp01(g + specArr[1] * lightColor[1] * spec);
-                b = clamp01(b + specArr[2] * lightColor[2] * spec);
-            }
-        }
-
-        return new org.example.Color(r, g, b);
-    }*/
 
     /**
      * Teste l'occlusion d'un point par un objet entre le point et la lumière.
@@ -429,11 +298,6 @@ public class Intersection {
         }
         return best;
     }
-    /*private double[] reflect(double[] I, double[] N, org.example.AbstractVec3 V) {
-        double dot = V.scalarProduct(I, N);
-        double[] twoN = V.multiplicationByScalar(2.0 * dot, N);
-        return V.subtraction(I, twoN);
-    }*/ //(Elle est maintenant dans AbstractVec3.java).
 
     private double clamp01(double v) {
         if (v < 0) return 0;

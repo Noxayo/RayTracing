@@ -133,7 +133,10 @@ public class SceneFileParser {
     }
 
     /**
-     * Parse: size largeur hauteur
+     * Parse: size largeur hauteur. Définit les dimensions de l'image.
+     * C'est une commande obligatoire pour le rendu.
+     * @param tokens Les jetons de la ligne (size, largeur, hauteur).
+     * @param scene L'objet scène à configurer.
      */
     private void parseSize(String[] tokens, Scene scene) {
         if (tokens.length != 3) {
